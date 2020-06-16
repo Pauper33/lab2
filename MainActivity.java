@@ -3,6 +3,8 @@ package com.example.myapplication;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -22,20 +24,34 @@ public class MainActivity extends AppCompatActivity {
     private double opposite1;
     private double opposite2;
     private double[] signal = new double[N];
+    TextView res;
+    double fftTime;
+    double dftTime;
+    long ctime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LineGraphSeries<DataPoint> series1 = new LineGraphSeries<>(generateSignal(signal));
+        ctime = System.currentTimeMillis();
         LineGraphSeries<DataPoint> series2 = new LineGraphSeries<>(fourier());
+        dftTime = (double) (System.currentTimeMillis() - ctime);
+        ctime = System.currentTimeMillis();
         LineGraphSeries<DataPoint> series3 = new LineGraphSeries<>(FFT());
+        fftTime = (double) (System.currentTimeMillis() - ctime);
         GraphView graph = findViewById(R.id.graph1);
         customizationGraph(graph, series1, -14, 14);
         graph = findViewById(R.id.graph2);
         customizationGraph(graph, series2, 0, 800);
         graph = findViewById(R.id.graph3);
         customizationGraph(graph, series3, 0, 800);
+
+        Toast.makeText(getApplicationContext(), String.format(
+                "Results for 1000 iteration: fft = %s ms; dft = %s ms",
+                Math.round(fftTime),
+                Math.round(dftTime)
+        ), Toast.LENGTH_LONG).show();
     }
 
     private DataPoint[] generateSignal(double[] res) {
